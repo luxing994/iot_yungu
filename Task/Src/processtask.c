@@ -8,8 +8,22 @@
 #include "recvtask.h"
 #include "uart.h"
 #include "esp8266.h"
+#include "time.h"
 
 uint8_t recvDataBuffer[128] = {0};
+
+uint64_t strtoint(char *str, uint32_t size)
+{
+    int i = 0;
+    uint64_t value = 0;
+    
+    while (str[i] != '\0') {
+        value += (str[i] - '0') * pow(10, size - i);
+        i++;
+    }
+
+    return value;
+}
 
 void ProcessTask(void const * argument)
 {
@@ -81,11 +95,6 @@ void ProcessTask(void const * argument)
                 ESP_SetCommondSwitch();
             }
 
-            ret = UART_ParseSendClosed(UART1, rdata);
-            if (ret == 0) {
-                HAL_NVIC_SystemReset();
-            }
-
             ret = UART_ParseSendEnd(UART1, rdata);
             if (ret == 0) {
                 ESP_SetTcpSendSwitch();
@@ -112,13 +121,17 @@ void ProcessTask(void const * argument)
                 getPasswordFlag = 1;
             }
 
+            if (recvDataBuffer[0] == '2') {
+                TIME_SetTimebase(strtoint(&recvDataBuffer[2], size));
+            }
+
             if ((getSsidFlag == 1) && (getPasswordFlag == 1)) {
                 getSsidFlag = 0;
                 getPasswordFlag = 0;
                 ESP_SetFlag(1);
                 ESP_WriteInfo();
                 HAL_Delay(1000);
-                HAL_NVIC_SystemReset();
+                // HAL_NVIC_SystemReset();
             }
             startPraseRecvFlag = 0;
         }

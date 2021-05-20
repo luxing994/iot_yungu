@@ -16,7 +16,7 @@ char *TCPServerCommond[] = {
 };
 
 char *TCPClientCommond[] = {
-    "AT+CWMODE=3\r\n", "AT+CIFSR\r\n", "AT+CIPSTART=\"TCP\",\"192.168.31.6\",777\r\n"
+    "AT+CWMODE=3\r\n", "AT+CIFSR\r\n", "AT+CIPSTART=\"TCP\",\"192.168.101.49\",777\r\n"
 };
 
 typedef struct {
@@ -177,14 +177,14 @@ int ESP_EnterTcpClientrMode(void)
         ESP_WriteInfo();
         UART_Printf("wifi config error\n");
         HAL_Delay(1000);
-        HAL_NVIC_SystemReset();
+        // HAL_NVIC_SystemReset();
     }
     (void)ESP_SendCommond((uint8_t *)TCPClientCommond[1], strlen(TCPClientCommond[1]), SENDCOMMONDTIMEOUT);
     ret = ESP_SendCommond((uint8_t *)TCPClientCommond[2], strlen(TCPClientCommond[2]), SENDCOMMONDTIMEOUT);
     if (ret != 0) {
         UART_Printf("tcp server config error\n");
         HAL_Delay(1000);
-        HAL_NVIC_SystemReset();
+        // HAL_NVIC_SystemReset();
     }
 
     return 0;
@@ -211,6 +211,8 @@ int ESP_Init(void)
             return -1;
         }
     }
+
+    UART_Printf("ESP init end!!!\n");
 
     HAL_Delay(1000);
 

@@ -1299,6 +1299,12 @@
             </file>
         </group>
         <group>
+            <name>TIME</name>
+            <file>
+                <name>$PROJ_DIR$\..\Drivers\TIME\time.c</name>
+            </file>
+        </group>
+        <group>
             <name>UART</name>
             <file>
                 <name>$PROJ_DIR$\..\Drivers\UART\uart.c</name>
