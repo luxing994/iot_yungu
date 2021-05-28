@@ -21,6 +21,7 @@
 #include "main.h"
 #include "uart.h"
 #include "cmsis_os.h"
+#include "event_groups.h"
 #include "inittask.h"
 
 /* Private includes ----------------------------------------------------------*/
@@ -39,11 +40,14 @@
 
 /* Private macro -------------------------------------------------------------*/
 /* USER CODE BEGIN PM */
-
+#define BIT_0	( 1 << 0 )
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
+extern osThreadId tempTaskHandle;
 osThreadId initTaskHandle;
+QueueHandle_t xQueue1;
+TIM_HandleTypeDef htim4;
 /* USER CODE BEGIN PV */
 
 /* USER CODE END PV */
@@ -51,6 +55,7 @@ osThreadId initTaskHandle;
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
+static void MX_TIM4_Init(void);
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -88,8 +93,10 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
+  MX_TIM4_Init();
   UART_Init(UART1, UART1_BAUDRATE);
   UART_Init(UART2, UART2_BAUDRATE);
+  // MX_TIM4_Init();
   /* USER CODE BEGIN 2 */
 
   /* USER CODE END 2 */
@@ -108,11 +115,11 @@ int main(void)
 
   /* USER CODE BEGIN RTOS_QUEUES */
   /* add queues, ... */
+  xQueue1 = xQueueCreate(32, sizeof(char *));
   /* USER CODE END RTOS_QUEUES */
-
   /* Create the thread(s) */
   /* definition and creation of defaultTask */
-  osThreadDef(initTask, InitTask, osPriorityAboveNormal, 0, 128);
+  osThreadDef(initTask, InitTask, osPriorityAboveNormal, 0, 1024);
   initTaskHandle = osThreadCreate(osThread(initTask), NULL);
 
   /* USER CODE BEGIN RTOS_THREADS */
@@ -204,14 +211,60 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(LD2_GPIO_Port, &GPIO_InitStruct);
+	
+ 	GPIO_InitStruct.Pin = GPIO_PIN_4;				 
+ 	GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_PULLUP;		 
+ 	GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_MEDIUM;
+ 	HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);				 
+ 	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_4, GPIO_PIN_SET);
 
   /* EXTI interrupt init*/
-  HAL_NVIC_SetPriority(EXTI15_10_IRQn, 1, 0);
+  HAL_NVIC_SetPriority(EXTI15_10_IRQn, 7, 0);
   HAL_NVIC_EnableIRQ(EXTI15_10_IRQn);
 
 }
 
 /* USER CODE BEGIN 4 */
+static void MX_TIM4_Init(void)
+{
+
+  /* USER CODE BEGIN TIM4_Init 0 */
+
+  /* USER CODE END TIM4_Init 0 */
+
+  TIM_ClockConfigTypeDef sClockSourceConfig = {0};
+  TIM_MasterConfigTypeDef sMasterConfig = {0};
+
+  /* USER CODE BEGIN TIM4_Init 1 */
+
+  /* USER CODE END TIM4_Init 1 */
+  htim4.Instance = TIM4;
+  htim4.Init.Prescaler = 8999;
+  htim4.Init.CounterMode = TIM_COUNTERMODE_UP;
+  htim4.Init.Period = 9999;
+  htim4.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
+  htim4.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_ENABLE;
+  if (HAL_TIM_Base_Init(&htim4) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  sClockSourceConfig.ClockSource = TIM_CLOCKSOURCE_INTERNAL;
+  if (HAL_TIM_ConfigClockSource(&htim4, &sClockSourceConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
+  sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
+  if (HAL_TIMEx_MasterConfigSynchronization(&htim4, &sMasterConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN TIM4_Init 2 */
+  HAL_TIM_Base_Start(&htim4);
+  /* USER CODE END TIM4_Init 2 */
+
+}
 
 /* USER CODE END 4 */
 
@@ -226,10 +279,11 @@ static void MX_GPIO_Init(void)
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
   /* USER CODE BEGIN Callback 0 */
-
   /* USER CODE END Callback 0 */
   if (htim->Instance == TIM7) {
     HAL_IncTick();
+  } else if (htim->Instance == TIM4) {
+    osSignalSet(tempTaskHandle, BIT_0);
   }
   /* USER CODE BEGIN Callback 1 */
 

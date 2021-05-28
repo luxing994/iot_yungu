@@ -2,6 +2,7 @@
 #include <stdint.h>
 #include <string.h>
 #include "main.h"
+#include "cmsis_os.h"
 #include "recvtask.h"
 #include "esp8266.h"
 #include "time.h"
@@ -9,22 +10,36 @@
 
 #define TCPSENDDATATIMEOUT 10000
 
+extern QueueHandle_t xQueue1;
 int sendflag = 0;
-uint64_t timenow = 0;
+int EspInitStatus = 1;
+char ledstr[128] = {0};
+
+int SYS_GetEspInitStatus(void)
+{
+    return EspInitStatus;
+}
 
 void RecvTask(void const * argument)
 {
-    char str[64] = {0};
-    int ret;
+    uint32_t recvp;
+    uint32_t sendaddr = (uint32_t)&ledstr;
 
-    ret = ESP_Init();
+    EspInitStatus = ESP_Init();
     while(1) {
         if (sendflag == 1) {
             sendflag = 0;
 
-            (void)sprintf(str, "{\"device\":\"LED\",\"time\":%lld,\"value\":%d}", TIME_GetTime(), HAL_GPIO_ReadPin(LD2_GPIO_Port, LD2_Pin));
-            if (ret == 0) {
-                ESP_SendDataTCP(0, (uint8_t *)str, strlen(str), TCPSENDDATATIMEOUT);
+            (void)sprintf(ledstr, "{\"device\":\"LED\",\"time\":%lld,\"value\":%d}", TIME_GetTime(), HAL_GPIO_ReadPin(LD2_GPIO_Port, LD2_Pin));
+            if(xQueueSend(xQueue1, (void *)&sendaddr, (TickType_t)10) != pdPASS) {
+                //TO DO
+            }
+        }
+
+        if(xQueueReceive(xQueue1, &recvp, (TickType_t)10) == pdPASS) {
+            // UART_Printf("%s", recvp);
+            if (EspInitStatus == 0) {
+                ESP_SendDataTCP(0, (uint8_t *)recvp, strlen((char *)recvp), TCPSENDDATATIMEOUT);
             }
         }
     }

@@ -4,6 +4,7 @@
 #include <string.h>
 #include <math.h>
 #include "main.h"
+#include "cmsis_os.h"
 #include "processtask.h"
 #include "recvtask.h"
 #include "uart.h"
@@ -11,15 +12,15 @@
 #include "time.h"
 
 uint8_t recvDataBuffer[128] = {0};
+uint64_t value = 0;
 
 uint64_t strtoint(char *str, uint32_t size)
 {
-    int i = 0;
-    uint64_t value = 0;
+    int i = size;
     
-    while (str[i] != '\0') {
-        value += (str[i] - '0') * pow(10, size - i);
-        i++;
+    while (i != 0) {
+        value += (str[size - i] - '0') * pow(10, i - 1);
+        i--;
     }
 
     return value;
@@ -122,7 +123,7 @@ void ProcessTask(void const * argument)
             }
 
             if (recvDataBuffer[0] == '2') {
-                TIME_SetTimebase(strtoint(&recvDataBuffer[2], size));
+                TIME_SetTimebase(strtoint(&recvDataBuffer[2], size) - xTaskGetTickCount());
             }
 
             if ((getSsidFlag == 1) && (getPasswordFlag == 1)) {

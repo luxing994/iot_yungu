@@ -363,6 +363,7 @@
                     <state>$PROJ_DIR$\..\Drivers\UART</state>
                     <state>$PROJ_DIR$\..\Drivers\FLASH</state>
                     <state>$PROJ_DIR$\..\Drivers\TIME</state>
+                    <state>$PROJ_DIR$\..\Drivers\SENSOR</state>
                 </option>
                 <option>
                     <name>CCStdIncCheck</name>
@@ -1093,6 +1094,9 @@
                 <file>
                     <name>$PROJ_DIR$\..\Task\Src\recvtask.c</name>
                 </file>
+                <file>
+                    <name>$PROJ_DIR$\..\Task\Src\temptask.c</name>
+                </file>
             </group>
         </group>
     </group>
@@ -1111,9 +1115,15 @@
             </file>
         </group>
         <group>
-            <name>FLASH</name>
+            <name>SENSOR</name>
+            <group>
+                <name>FLASH</name>
+                <file>
+                    <name>$PROJ_DIR$\..\Drivers\FLASH\flash.c</name>
+                </file>
+            </group>
             <file>
-                <name>$PROJ_DIR$\..\Drivers\FLASH\flash.c</name>
+                <name>$PROJ_DIR$\..\Drivers\SENSOR\dht22.c</name>
             </file>
         </group>
         <group>
