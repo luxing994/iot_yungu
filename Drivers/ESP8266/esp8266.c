@@ -91,7 +91,6 @@ static void ESP_ReadInfo(void)
 
 static int ESP_SendCommond(uint8_t *data, uint32_t size, uint32_t timeout)
 {
-    int ret;
     uint32_t tickstart = 0;
 
     tickstart = HAL_GetTick();
