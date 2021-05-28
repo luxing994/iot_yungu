@@ -9,6 +9,7 @@
 #include "uart.h"
 
 #define TCPSENDDATATIMEOUT 10000
+#define SWITCHTYPE 0
 
 extern QueueHandle_t xQueue1;
 int sendflag = 0;
@@ -30,8 +31,9 @@ void RecvTask(void const * argument)
         if (sendflag == 1) {
             sendflag = 0;
 
-            (void)sprintf(ledstr, "{\"device\":\"LED\",\"time\":%lld,\"value\":%d}", TIME_GetTime(), HAL_GPIO_ReadPin(LD2_GPIO_Port, LD2_Pin));
-            if(xQueueSend(xQueue1, (void *)&sendaddr, (TickType_t)10) != pdPASS) {
+            (void)sprintf(ledstr, "{\"DeviceType\":%d,\"Item\":{\"device\":\"LED\",\"time\":%lld,\"value\":%d}}", 
+                SWITCHTYPE, TIME_GetTime(), HAL_GPIO_ReadPin(LD2_GPIO_Port, LD2_Pin));
+            if (xQueueSend(xQueue1, (void *)&sendaddr, (TickType_t)10) != pdPASS) {
                 //TO DO
             }
         }

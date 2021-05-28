@@ -16,8 +16,8 @@ char *TCPServerCommond[] = {
 };
 
 char *TCPClientCommond[] = {
-    "AT+CWMODE=3\r\n", "AT+CIFSR\r\n", "AT+CIPSTART=\"TCP\",\"121.37.178.224\",8090\r\n"
-};
+    "AT+CWMODE=3\r\n", "AT+CIFSR\r\n", "AT+CIPSTART=\"TCP\",\"121.37.178.224\",8090\r\n"    // My huwawei cloud ip:121.37.178.224:8090
+};                                                                                          // Yungu ip:192.168.31.70:8090
 
 typedef struct {
     uint8_t flag;
@@ -213,7 +213,6 @@ int ESP_Init(void)
     }
 
     UART_Printf("ESP init end!!!\n");
-
     HAL_Delay(1000);
 
     return 0;
