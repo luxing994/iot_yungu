@@ -1222,6 +1222,9 @@
                     <name>$PROJ_DIR$\..\Task\Src\processtask.c</name>
                 </file>
                 <file>
+                    <name>$PROJ_DIR$\..\Task\Src\protocoltask.c</name>
+                </file>
+                <file>
                     <name>$PROJ_DIR$\..\Task\Src\recvtask.c</name>
                 </file>
                 <file>

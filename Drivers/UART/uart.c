@@ -18,6 +18,7 @@ UART_HandleTypeDef huart[UARTMAX];
 USART_TypeDef *uartpoint[UARTMAX] = {
     USART1,
     USART2,
+    USART6,
 };
 
 static void UART_InitBuffer(uint32_t channel)
@@ -88,6 +89,18 @@ int UART_RecvData(uint32_t channel)
     int ret;
 
     ret = HAL_UART_Receive_IT(&huart[channel], &(uartBuffer[channel].rdata), RECV_DATA_SIZE);
+    if (ret != 0) {
+        return -1;
+    }
+
+    return 0;
+}
+
+int UART_RecvDataDma(uint32_t channel)
+{
+    int ret;
+
+    ret = HAL_UART_Receive_DMA(&huart[channel], &(uartBuffer[channel].rdata), RECV_DATA_SIZE);
     if (ret != 0) {
         return -1;
     }
@@ -170,11 +183,6 @@ void USART1_IRQHandler(void)
     HAL_UART_IRQHandler(&huart[UART1]);
 }
 
-void USART2_IRQHandler(void)
-{
-    HAL_UART_IRQHandler(&huart[UART2]);
-}
-
 int UART_Printf(const char *format, ...)
 {
     uint8_t str[128] = {0};
@@ -204,5 +212,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
     if (huart->Instance == USART1) {
         (void)UART_WriteBufferByte(UART1, uartBuffer[UART1].rdata);
         HAL_UART_Receive_IT(&huart[UART1], &(uartBuffer[UART1].rdata), RECV_DATA_SIZE);
+    } else if (huart->Instance == USART6) {
+        (void)UART_WriteBufferByte(UART6, uartBuffer[UART6].rdata);
     }
 }

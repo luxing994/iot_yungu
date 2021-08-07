@@ -2,7 +2,6 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
-#include <math.h>
 #include "main.h"
 #include "cmsis_os.h"
 #include "processtask.h"
@@ -11,7 +10,7 @@
 #include "esp8266.h"
 #include "time.h"
 
-uint8_t recvDataBuffer[128] = {0};
+uint8_t recvDataBuffer[256] = {0};
 uint64_t value = 0;
 
 uint64_t strtoint(char *str, uint32_t size)
@@ -43,7 +42,7 @@ void ProcessTask(void const * argument)
     char *delim = ",";
     char *token[4];
     
-    (void)UART_RecvData(UART1);
+    (void)UART_RecvData(UART1); 
     while (1) {
         ret = UART_ReadBufferByte(UART1, &rdata);
         if ((startRecvFlag == 1) && (ret == 0)) {

@@ -364,6 +364,7 @@
                     <state>$PROJ_DIR$\..\Drivers\FLASH</state>
                     <state>$PROJ_DIR$\..\Drivers\TIME</state>
                     <state>$PROJ_DIR$\..\Drivers\SENSOR</state>
+                    <state>$PROJ_DIR$\..\Protocol</state>
                 </option>
                 <option>
                     <name>CCStdIncCheck</name>
@@ -1090,6 +1091,9 @@
                 </file>
                 <file>
                     <name>$PROJ_DIR$\..\Task\Src\processtask.c</name>
+                </file>
+                <file>
+                    <name>$PROJ_DIR$\..\Task\Src\protocoltask.c</name>
                 </file>
                 <file>
                     <name>$PROJ_DIR$\..\Task\Src\recvtask.c</name>

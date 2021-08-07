@@ -48,6 +48,7 @@ extern osThreadId tempTaskHandle;
 osThreadId initTaskHandle;
 QueueHandle_t xQueue1;
 TIM_HandleTypeDef htim4;
+DMA_HandleTypeDef hdma_usart6_rx;
 /* USER CODE BEGIN PV */
 
 /* USER CODE END PV */
@@ -56,6 +57,7 @@ TIM_HandleTypeDef htim4;
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 static void MX_TIM4_Init(void);
+static void MX_DMA_Init(void);
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -93,10 +95,11 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
-  MX_TIM4_Init();
+  MX_DMA_Init();
   UART_Init(UART1, UART1_BAUDRATE);
   UART_Init(UART2, UART2_BAUDRATE);
-  // MX_TIM4_Init();
+  UART_Init(UART6, UART6_BAUDRATE);
+  MX_TIM4_Init();
   /* USER CODE BEGIN 2 */
 
   /* USER CODE END 2 */
@@ -263,6 +266,22 @@ static void MX_TIM4_Init(void)
   /* USER CODE BEGIN TIM4_Init 2 */
   HAL_TIM_Base_Start(&htim4);
   /* USER CODE END TIM4_Init 2 */
+
+}
+
+/**
+  * Enable DMA controller clock
+  */
+static void MX_DMA_Init(void)
+{
+
+  /* DMA controller clock enable */
+  __HAL_RCC_DMA2_CLK_ENABLE();
+
+  /* DMA interrupt init */
+  /* DMA2_Stream1_IRQn interrupt configuration */
+  HAL_NVIC_SetPriority(DMA2_Stream1_IRQn, 5, 0);
+  HAL_NVIC_EnableIRQ(DMA2_Stream1_IRQn);
 
 }
 

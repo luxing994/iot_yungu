@@ -59,6 +59,7 @@
 /* External variables --------------------------------------------------------*/
 extern TIM_HandleTypeDef htim4;
 extern TIM_HandleTypeDef htim7;
+extern DMA_HandleTypeDef hdma_usart6_rx;
 
 /* USER CODE BEGIN EV */
 
@@ -202,6 +203,20 @@ void TIM4_IRQHandler(void)
   /* USER CODE BEGIN TIM4_IRQn 1 */
 
   /* USER CODE END TIM4_IRQn 1 */
+}
+
+/**
+  * @brief This function handles DMA2 stream1 global interrupt.
+  */
+void DMA2_Stream1_IRQHandler(void)
+{
+  /* USER CODE BEGIN DMA2_Stream1_IRQn 0 */
+
+  /* USER CODE END DMA2_Stream1_IRQn 0 */
+  HAL_DMA_IRQHandler(&hdma_usart6_rx);
+  /* USER CODE BEGIN DMA2_Stream1_IRQn 1 */
+
+  /* USER CODE END DMA2_Stream1_IRQn 1 */
 }
 
 /* USER CODE BEGIN 1 */

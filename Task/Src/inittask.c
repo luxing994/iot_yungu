@@ -5,6 +5,7 @@
 #include "processtask.h"
 #include "recvtask.h"
 #include "temptask.h"
+#include "protocoltask.h"
 #include "cmsis_os.h"
 #include "uart.h"
 #include "dht22.h"
@@ -14,6 +15,7 @@ extern TIM_HandleTypeDef htim4;
 osThreadId procTaskHandle;
 osThreadId recvTaskHandle;
 osThreadId tempTaskHandle;
+osThreadId protocolTaskHandle;
 
 void InitTask(void const * argument)
 {
@@ -23,6 +25,12 @@ void InitTask(void const * argument)
     UART_Printf("Iot terminal start!!!\n");
     DHT_Init();
     DHT_ReadData(&temperature,&humidity);
+
+    osThreadDef(protocolTask, ProtocolTask, osPriorityNormal, 0, 256);
+    protocolTaskHandle = osThreadCreate(osThread(protocolTask), NULL);
+    if (protocolTaskHandle == NULL) {
+        // TO DO
+    }
 
     osThreadDef(procTask, ProcessTask, osPriorityNormal, 0, 256);
     procTaskHandle = osThreadCreate(osThread(procTask), NULL);
