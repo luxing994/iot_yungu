@@ -3,9 +3,14 @@
 #include "cmsis_os.h"
 #include "format.h"
 #include "uart.h"
+#include "time.h"
 #include "protocoltask.h"
 
+#define CONTROLERTYPE 2
+
+extern QueueHandle_t xQueue1;
 DataFrame dataFrame;
+char controlerStr[128] = {0};
 
 int GetDataFromControler(void)
 {
@@ -37,20 +42,33 @@ int GetDataFromControler(void)
 	dataFrame.head[0] = HEAD_FIRST_BYTE;
 	dataFrame.head[1] = HEAD_SECOND_BYTE;
 	dataFrame.size = length;
-	memcpy(&dataFrame.type[0], outData, length - 3);
+	memcpy(&dataFrame.type[0], outData, length - 4);
+	dataFrame.data.crc8 = outData[length - 4];
 
 	return 0;
 }
 
 void ProtocolTask(void const * argument)
 {
-    TickType_t xLastWakeTime;
+    int ret;
+	uint32_t sendaddr = (uint32_t)&controlerStr;
+	uint16_t parameter = 0;
+
+	TickType_t xLastWakeTime;
  	const TickType_t xFrequency = 10;
 	
 	xLastWakeTime = xTaskGetTickCount();
 	(void)UART_RecvDataDma(UART6);
 	while (1) {
 		vTaskDelayUntil(&xLastWakeTime, xFrequency);
-		// GetDataFromControler();
+		ret = GetDataFromControler();
+		if (ret == 0) {
+			parameter = (dataFrame.data.data[1] << 8) | dataFrame.data.data[2];
+			(void)sprintf(controlerStr, "{\"DeviceType\":%d,\"Item\":{\"device\":%d,\"time\":%lld,\"value\":%d}}", 
+                CONTROLERTYPE, dataFrame.data.data[0], TIME_GetTime(), parameter);
+			if (xQueueSend(xQueue1, (void *)&sendaddr, (TickType_t)10) != pdPASS) {
+                //TO DO
+            }
+		}
 	}
 }

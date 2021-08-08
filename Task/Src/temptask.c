@@ -28,7 +28,7 @@ void TempTask(void const * argument)
                 // UART_Printf("Temperature: %f, humidity: %f\n", temperature, humidity);
                 (void)sprintf(tempstr, "{\"DeviceType\":%d,\"Item\":{\"device\":\"Temperature&Humidity\",\"time\":%lld,\"temperature\":%f,\"humidity\":%f}}", 
                     SENSORTYPE, TIME_GetTime(), temperature, humidity);
-                if(xQueueSend(xQueue1, (void *)&sendaddr, (TickType_t)10) != pdPASS) {
+                if (xQueueSend(xQueue1, (void *)&sendaddr, (TickType_t)10) != pdPASS) {
                     //TO DO
                 }
             }
