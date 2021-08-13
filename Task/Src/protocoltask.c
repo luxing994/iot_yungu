@@ -63,7 +63,7 @@ void ProtocolTask(void const * argument)
 		vTaskDelayUntil(&xLastWakeTime, xFrequency);
 		ret = GetDataFromControler();
 		if (ret == 0) {
-			parameter = (dataFrame.data.data[1] << 8) | dataFrame.data.data[2];
+			parameter = (dataFrame.data.data[2] << 8) | dataFrame.data.data[1];
 			(void)sprintf(controlerStr, "{\"DeviceType\":%d,\"Item\":{\"device\":%d,\"time\":%lld,\"value\":%d}}", 
                 CONTROLERTYPE, dataFrame.data.data[0], TIME_GetTime(), parameter);
 			if (xQueueSend(xQueue1, (void *)&sendaddr, (TickType_t)10) != pdPASS) {
