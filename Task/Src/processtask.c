@@ -100,29 +100,29 @@ void ProcessTask(void const * argument)
                 ESP_SetTcpSendSwitch();
             }
         } else if (startPraseRecvFlag == 1) {
-            if (recDataSize < 2) {
+            if (recDataSize < 1) {
                 startPraseRecvFlag = 0;
                 continue;
             }
 
-            if ((recvDataBuffer[1] >= '0') && (recvDataBuffer[1] <= '9')) {
-                size = recvDataBuffer[1] - '0';
-            } else if ((recvDataBuffer[1] >= 'A') && (recvDataBuffer[1] <= 'F')) {
-                size = recvDataBuffer[1] - 'A' + 10;
-            }
-
+            // if ((recvDataBuffer[1] >= '0') && (recvDataBuffer[1] <= '9')) {
+            //     size = recvDataBuffer[1] - '0';
+            // } else if ((recvDataBuffer[1] >= 'A') && (recvDataBuffer[1] <= 'F')) {
+            //     size = recvDataBuffer[1] - 'A' + 10;
+            // }
+            size = recDataSize - 1; // 1为头大小
             if (recvDataBuffer[0] == '0') {
-                ESP_SetSsid(&recvDataBuffer[2], size);
+                ESP_SetSsid(&recvDataBuffer[1], size);
                 getSsidFlag = 1;
             }
 
             if (recvDataBuffer[0] == '1') {
-                ESP_SetPassword(&recvDataBuffer[2], size);
+                ESP_SetPassword(&recvDataBuffer[1], size);
                 getPasswordFlag = 1;
             }
 
             if (recvDataBuffer[0] == '2') {
-                TIME_SetTimebase(strtoint(&recvDataBuffer[2], size) - xTaskGetTickCount());
+                TIME_SetTimebase(strtoint(&recvDataBuffer[1], size) - xTaskGetTickCount());
             }
 
             if ((getSsidFlag == 1) && (getPasswordFlag == 1)) {

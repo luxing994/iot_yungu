@@ -16,7 +16,7 @@ char *TCPServerCommond[] = {
 };
 
 char *TCPClientCommond[] = {
-    "AT+CWMODE=3\r\n", "AT+CIFSR\r\n", "AT+CIPSTART=\"TCP\",\"123.60.54.200\",8090\r\n"    // My huwawei cloud ip:123.60.54.200:8090
+    "AT+CWMODE=3\r\n", "AT+CIFSR\r\n", "AT+CIPSTART=\"TCP\",\"192.168.3.30\",8765\r\n"    // My huwawei cloud ip:123.60.54.200:8090
 };                                                                                          // Yungu ip:192.168.31.70:8090
 
 typedef struct {
